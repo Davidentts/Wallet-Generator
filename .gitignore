@@ -1,5 +1,6 @@
 seed_phrase.txt
 tron_wallets.txt
+tron_wallets_no_private.txt
 # Python-generated files
 *.py[oc]
 *.egg-info
