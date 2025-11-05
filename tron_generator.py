@@ -27,13 +27,13 @@ def main():
     save_wallets_to_file(wallets)
     save_wallets_to_file(
         wallets=wallets,
-        filename="tron_wallets_no_private.txt",
+        filename="data/tron_wallets_no_private.txt",
         add_private_key=False,
     )
 
-    print(f"✅ Seed phrase saved to 'seed_phrase.txt'")
+    print(f"✅ Seed phrase saved to 'data/seed_phrase.txt'")
     print(
-        f"✅ {wallet_count} wallets saved to 'tron_wallets.txt' and tron_wallets_no_private.txt"
+        f"✅ {wallet_count} wallets saved to 'data/tron_wallets.txt' and 'data/tron_wallets_no_private.txt'"
     )
 
 
@@ -54,7 +54,7 @@ def generate_seed_phrase(strength: int = 256) -> str:
     return mnemo.generate(strength=strength)
 
 
-def save_seed_to_file(seed_phrase: str, filename: str = "seed_phrase.txt") -> None:
+def save_seed_to_file(seed_phrase: str, filename: str = "data/seed_phrase.txt") -> None:
     """Save the seed phrase to a text file."""
     with open(filename, "w") as f:
         f.write(seed_phrase)
@@ -87,7 +87,7 @@ def generate_private_key_from_seed(seed: bytes, index: int) -> PrivateKey:
 
 def save_wallets_to_file(
     wallets,
-    filename: str = "tron_wallets.txt",
+    filename: str = "data/tron_wallets.txt",
     add_private_key: bool = True,
 ) -> None:
     """Save generated Tron wallets to a file."""
