@@ -7,5 +7,6 @@ requires-python = ">=3.13"
 dependencies = [
     "bip32utils>=0.3.post4",
     "mnemonic>=0.21",
+    "pykeepass>=4.1.1.post1",
     "tronpy>=0.6.1",
 ]

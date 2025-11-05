@@ -4,12 +4,13 @@ from mnemonic import Mnemonic
 from bip32utils import BIP32Key, BIP32_HARDEN
 from tronpy.keys import PrivateKey
 
-
-@dataclass
-class Wallet:
-    index: int
-    address: str
-    private_key: str
+from encoding_tools import (
+    Wallet,
+    KeePass,
+    get_is_convert_to_keepass,
+    get_password,
+    get_list_of_groups_for_keepass,
+)
 
 
 def main():
@@ -35,6 +36,14 @@ def main():
     print(
         f"✅ {wallet_count} wallets saved to 'data/tron_wallets.txt' and 'data/tron_wallets_no_private.txt'"
     )
+
+    # Step 5: Convert to KeePass
+    if get_is_convert_to_keepass():
+        save_wallets_to_keepass(seed_phrase=seed_phrase, wallets=wallets)
+        print("\n====================================")
+        print("✅ KeePass database successfully created!")
+        print("→ Database file: data/wallets.kdbx")
+        print("====================================\n")
 
 
 def get_wallet_count() -> int:
@@ -102,6 +111,26 @@ def save_wallets_to_file(
             f.write(f"Address {wallet.index}: {wallet.address}\n")
             if add_private_key:
                 f.write(f"Private key {wallet.index}: {wallet.private_key}\n\n")
+
+
+def save_wallets_to_keepass(seed_phrase: str, wallets: list[Wallet]) -> None:
+    """Save generated Tron wallets to a KeePass storage file."""
+    password = get_password()
+    groups = get_list_of_groups_for_keepass(maximum=len(wallets))
+    keepass = KeePass(
+        password=password,
+        groups=groups,
+    )
+    keepass.add_seed_phrase(seed_phrase)
+    if groups:
+        chunk_size = len(wallets) // len(groups)
+        chunks = [
+            wallets[i : i + chunk_size] for i in range(0, len(wallets), chunk_size)
+        ]
+        for i in range(0, len(groups)):
+            keepass.add_wallets_to_group(group_name=groups[i], wallets=chunks[i])
+    else:
+        keepass.add_wallets_to_group(wallets=wallets)
 
 
 if __name__ == "__main__":
