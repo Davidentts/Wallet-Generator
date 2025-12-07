@@ -1,6 +1,17 @@
 import getpass
 
 
+def get_wallet_count() -> int:
+    """Ask the user for the number of wallets to generate and validate input."""
+    while True:
+        user_input = input("Enter the number of wallets to generate (min 1): ").strip()
+        if user_input.isdigit():
+            count = int(user_input)
+            if count >= 1:
+                return count
+        print("Invalid input. Please enter a positive integer greater than 0.")
+
+
 def get_is_convert_to_keepass() -> bool:
     while True:
         yes_or_no = input("Do you want to put wallets into keepass? (y/n) ")

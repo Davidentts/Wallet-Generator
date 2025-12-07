@@ -815,9 +815,9 @@ wheels = [
 ]
 
 [[package]]
-name = "walletgenerate"
+name = "wallet-generator"
 version = "0.1.0"
-source = { virtual = "." }
+source = { editable = "." }
 dependencies = [
     { name = "bip32utils" },
     { name = "mnemonic" },
