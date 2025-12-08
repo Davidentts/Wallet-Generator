@@ -1,6 +1,8 @@
-from pykeepass import create_database
+from pathlib import Path
 
-from encoding_tools.schemas.wallet import Wallet
+from pykeepass import create_database, PyKeePass
+
+from wallet_generator.common.schemas import Wallet
 
 
 class KeePass:
@@ -8,12 +10,12 @@ class KeePass:
     def __init__(
         self,
         password: str,
+        path: Path,
         groups: list[str] | None = None,
         filename: str = "wallets.kdbx",
-        path: str = "data/",
     ) -> None:
-        self.db = create_database(
-            filename=path + filename,
+        self.db: PyKeePass = create_database(
+            filename=path / filename,
             password=password,
         )
         self.groups = {}
