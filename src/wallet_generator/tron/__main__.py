@@ -2,7 +2,7 @@ from wallet_generator.common.config import BASE_DIR
 from wallet_generator.common.schemas import Wallet
 from wallet_generator.common.utils.input import (
     get_wallet_count,
-    get_is_convert_to_keepass,
+    ask_user,
 )
 from wallet_generator.common.utils.output import (
     save_seed_to_file,
@@ -47,7 +47,7 @@ def main():
         )
 
         # Step 5: Convert to KeePass
-        if get_is_convert_to_keepass():
+        if ask_user(question="Do you want to put wallets into keepass?"):
             save_wallets_to_keepass(
                 seed_phrase=seed_phrase,
                 wallets=wallets,
