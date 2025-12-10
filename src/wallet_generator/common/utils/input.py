@@ -12,9 +12,10 @@ def get_wallet_count() -> int:
         print("Invalid input. Please enter a positive integer greater than 0.")
 
 
-def get_is_convert_to_keepass() -> bool:
+def ask_user(question: str) -> bool:
+    """Ask the user for saving the wallets to a file without encryption."""
     while True:
-        yes_or_no = input("Do you want to put wallets into keepass? (y/n) ")
+        yes_or_no = input(f"{question} (y/n) ").strip()
         if yes_or_no == "y":
             return True
         if yes_or_no == "n":
@@ -47,6 +48,9 @@ def get_list_of_groups_for_keepass(maximum: int) -> list[str] | None:
         group_name = input(f"Enter group name ('end' to quit, max {maximum} groups): ")
         if group_name == "end":
             break
+        if group_name in list_of_groups:
+            print("You are already using this name. Please choose a different name.")
+            continue
         if len(group_name) < maximum:
             list_of_groups.append(group_name)
         else:
