@@ -1,3 +1,4 @@
+import math
 import warnings
 
 from .wallet import Wallet
@@ -7,12 +8,12 @@ from .group import WalletGroup, MainWalletGroup
 class WalletRegistry:
 
     def __init__(self):
-        self._groups: dict[str, WalletGroup] = {
+        self._groups: dict[str, WalletGroup | MainWalletGroup] = {
             "main": MainWalletGroup(description="Main group"),
         }
 
     @property
-    def main_group(self) -> WalletGroup:
+    def main_group(self) -> MainWalletGroup:
         return self._groups.get("main")
 
     @staticmethod
@@ -53,7 +54,7 @@ class WalletRegistry:
             self.main_group.add_wallets(wallets)
             return
 
-        chunk_size = len(wallets) // len(self.all_groups())
+        chunk_size = math.ceil(len(wallets) / len(self.all_groups()))
         chunks_wallets = [
             wallets[i : i + chunk_size] for i in range(0, len(wallets), chunk_size)
         ]
