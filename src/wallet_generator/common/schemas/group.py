@@ -49,6 +49,23 @@ class WalletGroup:
     def __repr__(self) -> str:
         return f"WalletGroup(name='{self.name}', size={self.actual_size}, description='{self.description})"
 
+    def __str__(self) -> str:
+        return (
+            f"Group: {self.name}"
+            f"\nSize: {self.actual_size}"
+            f"\nWallets:\n{"\n".join([w.to_str() for w in self.wallets])}"
+        )
+
+    def to_str(self, verbose: bool = False) -> str:
+        if verbose:
+            return (
+                f"Group: {self.name}"
+                f"\nDescription: {self.description}"
+                f"\nSize: {self.actual_size}"
+                f"\nWallets:\n{"\n\n".join([w.to_str(with_private_key=True) for w in self.wallets])}"
+            )
+        return str(self)
+
 
 @dataclass
 class MainWalletGroup(WalletGroup):

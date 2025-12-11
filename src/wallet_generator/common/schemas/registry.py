@@ -54,9 +54,6 @@ class WalletRegistry:
             return
 
         chunk_size = len(wallets) // len(self.all_groups())
-        print(
-            f"Chunk size: {chunk_size}\nlen(wallets): {len(wallets)}\nlen(groups): {len(self.all_groups())}"
-        )
         chunks_wallets = [
             wallets[i : i + chunk_size] for i in range(0, len(wallets), chunk_size)
         ]
@@ -86,3 +83,11 @@ class WalletRegistry:
 
     def __repr__(self) -> str:
         return f"WalletRegistry(groups={self.all_groups()})"
+
+    def __str__(self) -> str:
+        return "\n".join([str(g) for g in self.all_groups(include_main=True)])
+
+    def to_str(self, verbose: bool = False) -> str:
+        return "\n\n".join(
+            [g.to_str(verbose=verbose) for g in self.all_groups(include_main=True)]
+        )

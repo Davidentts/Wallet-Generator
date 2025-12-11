@@ -22,3 +22,11 @@ class Wallet:
             else self.private_key
         )
         return f"Wallet(index={self.index}, address='{self.address}', private_key='{shortened_pk}')"
+
+    def __str__(self) -> str:
+        return f"Address {self.index}: {self.address}"
+
+    def to_str(self, with_private_key: bool = False) -> str:
+        if with_private_key:
+            return str(self) + f"\nPrivate Key: {self.private_key}"
+        return str(self)
