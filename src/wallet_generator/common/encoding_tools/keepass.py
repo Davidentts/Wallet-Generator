@@ -2,7 +2,11 @@ from pathlib import Path
 
 from pykeepass import create_database, PyKeePass
 
-from wallet_generator.common.schemas import Wallet
+from wallet_generator.common.schemas import (
+    WalletRegistry,
+    WalletGroup,
+    MainWalletGroup,
+)
 
 
 class KeePass:
@@ -11,27 +15,32 @@ class KeePass:
         self,
         password: str,
         path: Path,
-        groups: list[str] | None = None,
+        registry: WalletRegistry = None,
         filename: str = "wallets.kdbx",
     ) -> None:
         self.db: PyKeePass = create_database(
             filename=path / filename,
             password=password,
         )
-        self.groups = {}
-        if groups:
-            for name in groups:
-                grp = self.db.add_group(self.db.root_group, name)
-                self.groups[name] = grp
+        self.keepass_groups = {}
+        for group in registry.all_groups():
+            grp = self.db.add_group(
+                self.db.root_group,
+                group_name=group.name,
+                notes=group.description,
+            )
+            self.keepass_groups[group.name] = grp
 
-    def add_wallets_to_group(
-        self, wallets: list[Wallet], group_name: str | None = None
-    ) -> None:
-        group = self.groups.get(group_name) if group_name else self.db.root_group
-        for wallet in wallets:
+    def fill_group_with_wallets(self, group: WalletGroup | MainWalletGroup) -> None:
+        """
+        The function copies wallets from the transferred group instance
+        to the local group of the KeePass database
+        """
+        keepass_group = self.keepass_groups.get(group.name, self.db.root_group)
+        for wallet in group.wallets:
             title = f"{wallet.address[:4]}...{wallet.address[-4:]}"
             self.db.add_entry(
-                destination_group=group,
+                destination_group=keepass_group,
                 title=title,
                 username=wallet.address,
                 password=wallet.private_key,
