@@ -1,5 +1,7 @@
 import getpass
 
+from wallet_generator.common.schemas import WalletRegistry, WalletGroup
+
 
 def get_wallet_count() -> int:
     """Ask the user for the number of wallets to generate and validate input."""
@@ -42,19 +44,20 @@ def get_password() -> str:
             return password
 
 
-def get_list_of_groups_for_keepass(maximum: int) -> list[str] | None:
-    list_of_groups = []
+def get_list_of_groups(registry: WalletRegistry, maximum: int) -> None:
     while True:
-        group_name = input(f"Enter group name ('end' to quit, max {maximum} groups): ")
-        if group_name == "end":
+        group_name = input(
+            f"Enter group name (Press 'Enter' to quit, max {maximum} groups): "
+        )
+        if group_name == "":
             break
-        if group_name in list_of_groups:
-            print("You are already using this name. Please choose a different name.")
-            continue
-        if len(group_name) < maximum:
-            list_of_groups.append(group_name)
-        else:
+        description = input(f"Enter description (Press 'Enter' to skip): ")
+        registry.add_group(
+            WalletGroup(
+                name=group_name,
+                description=description,
+            )
+        )
+        if len(registry.all_groups()) == maximum:
             break
-    if list_of_groups:
-        return list_of_groups
     return None
