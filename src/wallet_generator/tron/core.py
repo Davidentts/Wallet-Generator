@@ -1,8 +1,12 @@
+from pathlib import Path
+
 from mnemonic import Mnemonic
 from tronpy.keys import PrivateKey
 from bip32utils import BIP32Key, BIP32_HARDEN
 
-from wallet_generator.common.schemas import Wallet
+from wallet_generator.common.encoding_tools import KeePass
+from wallet_generator.common.schemas import Wallet, WalletRegistry
+from wallet_generator.common.utils.input import get_password
 
 
 def generate_seed_phrase(strength: int = 256) -> str:
@@ -34,3 +38,21 @@ def generate_private_key_from_seed(seed: bytes, index: int) -> PrivateKey:
         key = key.ChildKey(p)
 
     return PrivateKey(key.PrivateKey())
+
+
+def save_wallets_to_keepass(
+    registry: WalletRegistry,
+    path: Path,
+    filename: str = "wallets.kdbx",
+) -> None:
+    """Save generated Tron wallets to a KeePass storage file."""
+    password = get_password()
+    keepass = KeePass(
+        password=password,
+        registry=registry,
+        path=path,
+        filename=filename,
+    )
+    keepass.add_seed_phrase(registry.main_group.seed_phrase)
+    for group in registry:
+        keepass.fill_group_with_wallets(group)

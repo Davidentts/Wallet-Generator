@@ -1,56 +1,62 @@
 from wallet_generator.common.config import BASE_DIR
-from wallet_generator.common.schemas import Wallet
+from wallet_generator.common.schemas import (
+    Wallet,
+    WalletRegistry,
+)
 from wallet_generator.common.utils.input import (
     get_wallet_count,
     ask_user,
+    get_list_of_groups,
 )
 from wallet_generator.common.utils.output import (
     save_seed_to_file,
     save_wallets_to_file,
-    save_wallets_to_keepass,
 )
-from .core import generate_seed_phrase, generate_wallets
+from .core import generate_seed_phrase, generate_wallets, save_wallets_to_keepass
 
 
 def main():
     try:
         print("Welcome to Tron wallet generator!")
 
-        # Step 1: Get wallet count from user
         wallet_count = get_wallet_count()
+        registry = WalletRegistry()
 
-        # Step 2: Generate and save seed phrase
-        seed_phrase = generate_seed_phrase()
-        save_seed_to_file(
-            seed_phrase=seed_phrase,
-            path=BASE_DIR,
+        registry.main_group.seed_phrase = generate_seed_phrase()
+
+        wallets: list[Wallet] = generate_wallets(
+            registry.main_group.seed_phrase,
+            count=wallet_count,
         )
 
-        # Step 3: Generate wallets
-        wallets: list[Wallet] = generate_wallets(seed_phrase, count=wallet_count)
+        if ask_user("Would you like to distribute wallets into groups?"):
+            get_list_of_groups(registry, maximum=wallet_count)
+        registry.dist_wallets_into_groups(wallets)
 
-        # Step 4: Save wallets to files (with private keys and without)
-        save_wallets_to_file(
-            wallets=wallets,
-            path=BASE_DIR,
-        )
-        save_wallets_to_file(
-            wallets=wallets,
-            path=BASE_DIR,
-            add_private_key=False,  # List of wallets will be safe
-            filename="tron_wallets_no_private.txt",
-        )
+        if ask_user("Do you want to save wallets and seed to file without encryption?"):
+            save_wallets_to_file(
+                registry=registry,
+                path=BASE_DIR,
+                filename="tron_wallets.txt",
+                add_private_key=True,
+            )
+            save_seed_to_file(
+                seed_phrase=registry.main_group.seed_phrase,
+                path=BASE_DIR,
+            )
+            save_wallets_to_file(
+                registry=registry,
+                path=BASE_DIR,
+            )
+            print(f"✅ Seed phrase saved to '{BASE_DIR}/seed_phrase.txt'")
+            print(f"✅ {wallet_count} wallets saved to '{BASE_DIR}/tron_wallets.txt'")
+            print(
+                f"✅ {wallet_count} wallets saved to '{BASE_DIR}/tron_wallets_no_private.txt'"
+            )
 
-        print(f"✅ Seed phrase saved to '{BASE_DIR}/seed_phrase.txt'")
-        print(
-            f"✅ {wallet_count} wallets saved to '{BASE_DIR}/tron_wallets.txt' and '{BASE_DIR}/tron_wallets_no_private.txt'"
-        )
-
-        # Step 5: Convert to KeePass
         if ask_user(question="Do you want to put wallets into keepass?"):
             save_wallets_to_keepass(
-                seed_phrase=seed_phrase,
-                wallets=wallets,
+                registry=registry,
                 path=BASE_DIR,
             )
             print("\n====================================")
