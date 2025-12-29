@@ -1,4 +1,6 @@
 import getpass
+from collections.abc import Callable
+from typing import TypeVar
 
 from wallet_generator.common.schemas import WalletRegistry, WalletGroup
 
@@ -14,7 +16,7 @@ def get_wallet_count() -> int:
         print("Invalid input. Please enter a positive integer greater than 0.")
 
 
-def ask_user(question: str) -> bool:
+def ask_user_short(question: str) -> bool:
     """Ask the user for saving the wallets to a file without encryption."""
     while True:
         yes_or_no = input(f"{question} (y/n) ").strip()
@@ -23,6 +25,29 @@ def ask_user(question: str) -> bool:
         if yes_or_no == "n":
             return False
         print("Please enter 'y' or 'n'")
+
+
+T = TypeVar("T")
+V = TypeVar("V")
+
+
+def ask_user(
+    question: str,
+    options: list,
+    func_for_print: Callable[[T], str],
+    func_for_result: Callable[[T], V],
+) -> V:
+    options_dict = {i + 1: options[i] for i in range(len(options))}
+    print(question)
+    for num, option in options_dict.items():
+        print(f"{num}. {func_for_print(option)}")
+    while True:
+        user_input = input(f"Please, enter a number from 1 to {len(options)}: ").strip()
+        if user_input.isdigit():
+            user_number = int(user_input)
+            if 0 < user_number <= len(options):
+                return func_for_result(options_dict.get(user_number))
+        print("Invalid input.")
 
 
 def get_password() -> str:
