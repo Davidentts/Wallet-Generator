@@ -69,7 +69,7 @@ def save_files_with_secrets(
     registry: WalletRegistry,
     pass_file: Path,
     save_dir: Path,
-    keepass_file: Path,
+    keepass_file: Path | None,
 ) -> None:
 
     @dataclass
@@ -93,10 +93,13 @@ def save_files_with_secrets(
         FileParam(
             name="list of wallets", filename="tron_wallets", data=registry.to_str()
         ),
-        FileParam(
-            name="KeePass file", filename=keepass_file.name, path_file=keepass_file
-        ),
     ]
+    if keepass_file:
+        files_params.append(
+            FileParam(
+                name="KeePass file", filename=keepass_file.name, path_file=keepass_file
+            )
+        )
     verbose = [
         "Save without encryption (not recommended)",
         "Encrypt using symmetric encryption",
